@@ -14,4 +14,4 @@ In case you'd want to run tests, you will need [Catch2 library](https://github.c
 
 ## Usage
 
-Download JSMN and my wrapper, put them in same directory, setup your project, and go to Wiki and read manual.
+Download JSMN and my wrapper, put them in same directory, setup your project, and then go to Wiki and **RTFM**.

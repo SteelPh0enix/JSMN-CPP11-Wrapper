@@ -11,11 +11,12 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 set(CATCH_INCLUDE_DIR "." CACHE PATH "Catch library include directory")
+set(JSNM_INCLUDE_DIR ".." CACHE PATH "JSMN and wrapper include directory")
 
 # List with test names, should be same as *.cpp files, but without extensions
-set(TEST_NAMES "cmake_test")
+set(TEST_NAMES "cmake_building_test;basic_deserialization_test")
 
-include_directories(${CATCH_INCLUDE_DIR})
+include_directories(${CATCH_INCLUDE_DIR} ${JSNM_INCLUDE_DIR})
 
 foreach(TEST ${TEST_NAMES})
   add_executable(${TEST} "${TEST}.cpp")

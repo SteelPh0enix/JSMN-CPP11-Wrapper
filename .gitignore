@@ -2,3 +2,8 @@
 jsmn.h
 jsmn.c
 catch.hpp
+CMakeFiles
+*.cmake
+CMakeCache.txt
+Makefile
+*.exe
