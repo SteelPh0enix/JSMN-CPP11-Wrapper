@@ -4,6 +4,27 @@
 
 #include "jsmn.h"
 
+struct JsonStringView {
+  char const* str;
+  size_t length;
+};
+namespace {
+template <typename T>
+void ignore(T&&) {}
+}  // namespace
+
+// Default behaviour is to return new, empty object, if there is no available
+// overload
+// This function should parse JSON based on token and JSON string, and return
+// value of demanded type. Feel free to overload for your own types.
+template <typename T>
+T parseJsonValue(jsmntok_t const& token, char const* json) {
+  // suppress "unused argument" warnings
+  ignore(token);
+  ignore(json);
+  return T{};
+}
+
 template <size_t MaxTokenCount>
 class JsonParser {
  public:
@@ -43,13 +64,16 @@ class JsonParser {
   template <typename T>
   T get(char const* key) {
     // Linear search for the key
-    for (auto* token = mTokens; token < mTokens + MaxTokenCount; token += 2) {
+    for (auto* token = mTokens; token < mTokens + MaxTokenCount; token++) {
       const size_t tokenLength = token->end - token->start;
       if (token->type == JSMN_STRING && strlen(key) == tokenLength &&
           strncmp(mJson + token->start, key, tokenLength) == 0) {
-        return parseJsonValue<T>(*(token + 1));
+        return parseJsonValue<T>(*(token + 1), mJson);
       }
     }
+
+    // Return default value of type if no key was found
+    return T{};
   }
 
  private:
@@ -60,7 +84,73 @@ class JsonParser {
   bool mParsed;
 };
 
-template <typename T>
-T parseJsonValue(jsmntok_t const& token) {}
+template <>
+long parseJsonValue(jsmntok_t const& token, char const* json) {
+  return strtol(json + token.start, nullptr, 10);
+}
+
+template <>
+int parseJsonValue(jsmntok_t const& token, char const* json) {
+  // I'll just use `strtol` for every int-like overload, since it's pretty
+  // stable, leaving type size management to user.
+  return static_cast<int>(parseJsonValue<long>(token, json));
+}
+
+template <>
+short parseJsonValue(jsmntok_t const& token, char const* json) {
+  return static_cast<short>(parseJsonValue<long>(token, json));
+}
+
+template <>
+long long parseJsonValue(jsmntok_t const& token, char const* json) {
+  // In this case i have to use strtoll
+  return strtoll(json + token.start, nullptr, 10);
+}
+
+template <>
+unsigned long parseJsonValue(jsmntok_t const& token, char const* json) {
+  // Different function for unsigneds, same stuff for rest of unsigned-like
+  // types
+  return strtoul(json + token.start, nullptr, 10);
+}
+
+template <>
+unsigned int parseJsonValue(jsmntok_t const& token, char const* json) {
+  // I'll just use `strtol` for every int-like overload, since it's pretty
+  // stable, leaving type size management to user.
+  return static_cast<unsigned int>(parseJsonValue<unsigned long>(token, json));
+}
+
+template <>
+unsigned short parseJsonValue(jsmntok_t const& token, char const* json) {
+  return static_cast<unsigned short>(
+      parseJsonValue<unsigned long>(token, json));
+}
+
+template <>
+unsigned long long parseJsonValue(jsmntok_t const& token, char const* json) {
+  // In this case i have to use strtoull
+  return strtoull(json + token.start, nullptr, 10);
+}
+
+template <>
+bool parseJsonValue(jsmntok_t const& token, char const* json) {
+  return strncmp(json + token.start, "true", token.end - token.start) == 0;
+}
+
+template <>
+float parseJsonValue(jsmntok_t const& token, char const* json) {
+  return strtof(json + token.start, nullptr);
+}
+
+template <>
+double parseJsonValue(jsmntok_t const& token, char const* json) {
+  return strtod(json + token.start, nullptr);
+}
+
+template <>
+long double parseJsonValue(jsmntok_t const& token, char const* json) {
+  return strtold(json + token.start, nullptr);
+}
 
 #endif
