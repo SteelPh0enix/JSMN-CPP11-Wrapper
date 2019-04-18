@@ -14,7 +14,7 @@ set(CATCH_INCLUDE_DIR "." CACHE PATH "Catch library include directory")
 set(JSNM_INCLUDE_DIR ".." CACHE PATH "JSMN and wrapper include directory")
 
 # List with test names, should be same as *.cpp files, but without extensions
-set(TEST_NAMES "cmake_building_test;basic_deserialization_test")
+set(TEST_NAMES "cmake_building_test;basic_deserialization_test;jsonparser_behaviour_test")
 
 include_directories(${CATCH_INCLUDE_DIR} ${JSNM_INCLUDE_DIR})
 
