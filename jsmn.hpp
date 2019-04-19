@@ -37,6 +37,11 @@ T parseJsonValue(jsmntok_t const& token, char const* json) {
 /// arrays, objects) are tokens. So, for example, this json: {"test": 3, "a":
 /// {"b": 5}} contains 7 tokens ("test", 3, "a", "b", 5, and two objects - first
 /// with {"b": 5}, second with whole JSON).
+///
+/// Constrains: Every key and string value must be unique. Maybe i will change
+/// this in future, but - since i expect this class to be used with simple
+/// JSONs, in restricted environment - i prefer to keep it as simple as
+/// possible.
 template <size_t MaxTokenCount>
 class JsonParser {
  public:
@@ -101,18 +106,17 @@ class JsonParser {
   template <typename T>
   T get(char const* key) {
     TokenPair tokens = getTokenPair(key);
-    if (tokens.name.type == JSMN_UNDEFINED) {
+    if (tokens.name == nullptr || tokens.value == nullptr) {
       // Return default value of type if no key was found
       return T{};
     }
 
-    return parseJsonValue<T>(tokens.value, jsonString());
+    return parseJsonValue<T>(*(tokens.value), jsonString());
   }
 
   /// Copies requested string from JSON to buffer passed as argument and returns
-  /// `true`. If `key` wasn't found in JSON, or value is empty, does nothing and
-  /// returns `false`.
-  /// Complexity: linear
+  /// `true`. If `key` wasn't found in JSON, value is empty, or pointer to
+  /// buffer is invalid, does nothing and returns `false`. Complexity: linear
   bool getString(char const* key, char* buffer) {
     if (buffer == nullptr) {
       return false;
@@ -127,10 +131,31 @@ class JsonParser {
     return true;
   }
 
+  /// Copies an array of values from JSON to buffer. If `key` wasn't found in
+  /// JSON, array is empty, or pointer to buffer is invalid, does nothing and
+  /// returns `false`. Complexity: linear
+  template <typename T>
+  bool getArray(char const* key, T* buffer) {
+    if (buffer == nullptr) {
+      return false;
+    }
+
+    TokenPair arrayTokens = getTokenPair(key);
+    if (arrayTokens.value == nullptr) {
+      return false;
+    }
+
+    for (int i = 0; i < arrayTokens.value->size; i++) {
+      buffer[i] = parseJsonValue<T>(*(arrayTokens.value + i + 1), jsonString());
+    }
+
+    return true;
+  }
+
  private:
   struct TokenPair {
-    jsmntok_t name;
-    jsmntok_t value;
+    jsmntok_t const* name;
+    jsmntok_t const* value;
   };
 
   TokenPair getTokenPair(char const* key) {
@@ -140,12 +165,12 @@ class JsonParser {
         const size_t tokenLength = token->end - token->start;
         if (token->type == JSMN_STRING && strlen(key) == tokenLength &&
             strncmp(mJson + token->start, key, tokenLength) == 0) {
-          return TokenPair{*token, *(token + 1)};
+          return TokenPair{token, (token + 1)};
         }
       }
     }
 
-    return TokenPair{};
+    return TokenPair{nullptr, nullptr};
   }
 
   jsmntok_t mTokens[MaxTokenCount]{};

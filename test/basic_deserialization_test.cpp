@@ -81,12 +81,34 @@ TEST_CASE("String parsing test, with copying", "[deserialization]") {
   char testString1Buf[32];
   char teststrBuf[32];
   char notExistingBuf[32];
+  char* invalidPtr{nullptr};
 
   REQUIRE(j.getString("TestString1", testString1Buf) == true);
   REQUIRE(j.getString("teststr", teststrBuf) == true);
   REQUIRE(j.getString("does not exists", notExistingBuf) == false);
   REQUIRE(j.getString("teststr", nullptr) == false);
+  REQUIRE(j.getString("teststr", invalidPtr) == false);
 
   REQUIRE(strcmp(testString1Buf, "This is a test") == 0);
   REQUIRE(strcmp(teststrBuf, "another test string") == 0);
+}
+
+TEST_CASE("Array parsing", "[deserialization]") {
+  JsonParser<11> j(R"({"Array test": [1, 2, 3, 4, 5, 6, 7, 8]})");
+
+  REQUIRE(j.parse() == 11);
+
+  int buf[8]{};
+  int invalidBuf[8]{};
+  int* invalidPtr{nullptr};
+
+  REQUIRE(j.getArray("Array test", buf) == true);
+  /// Won't compile, because nullptr_t can't be used with this template
+  // REQUIRE(j.getArray("Array test", nullptr) == false);
+  REQUIRE(j.getArray("Array test", invalidPtr) == false);
+  REQUIRE(j.getArray("Invalid", invalidBuf) == false);
+
+  for (int i = 0; i < 8; i++) {
+    REQUIRE(buf[i] == i + 1);
+  }
 }
