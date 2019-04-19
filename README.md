@@ -12,6 +12,8 @@ Only JSMN, and at least C++11-compatible compiler. I've used [modernized (header
 
 In case you'd want to run tests, you will need [Catch2 library](https://github.com/catchorg/Catch2) and CMake. Go to [tests](./test) directory for more information.
 
+**It does not need C++ standard library support, only C stdlib is necessary**, which makes it a good choice for embedded platforms (Arduino for example)
+
 ## Usage
 
 Download JSMN and my wrapper, put them in same directory, setup your project, and then go to Wiki and **RTFM**.
