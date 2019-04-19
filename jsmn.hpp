@@ -12,7 +12,7 @@
 /// get a copy of string, use `JsonParser::getString` method.
 struct JsonStringView {
   char const* str;
-  size_t length;
+  int length;
 };
 
 namespace {
@@ -96,8 +96,8 @@ class JsonParser {
   /// Searches for key in JSON and returns value of requested type. Uses
   /// `parseJsonValue` function to convert string to requested type. In case
   /// there is no specialization for used type, or requested key wasn't found,
-  /// it will return empty, default- or zero-initialized object. Complexity:
-  /// linear
+  /// it will return empty, default- or zero-initialized object.
+  /// Complexity: linear
   template <typename T>
   T get(char const* key) {
     TokenPair tokens = getTokenPair(key);
@@ -112,7 +112,12 @@ class JsonParser {
   /// Copies requested string from JSON to buffer passed as argument and returns
   /// `true`. If `key` wasn't found in JSON, or value is empty, does nothing and
   /// returns `false`.
+  /// Complexity: linear
   bool getString(char const* key, char* buffer) {
+    if (buffer == nullptr) {
+      return false;
+    }
+
     JsonStringView str = get<JsonStringView>(key);
     if (str.length == 0) {
       return false;
@@ -156,7 +161,10 @@ class JsonParser {
 
 template <>
 long parseJsonValue(jsmntok_t const& token, char const* json) {
-  return strtol(json + token.start, nullptr, 10);
+  if (token.type == JSMN_PRIMITIVE) {
+    return strtol(json + token.start, nullptr, 10);
+  }
+  return 0l;
 }
 
 template <>
@@ -174,14 +182,20 @@ short parseJsonValue(jsmntok_t const& token, char const* json) {
 template <>
 long long parseJsonValue(jsmntok_t const& token, char const* json) {
   // In this case i have to use strtoll
-  return strtoll(json + token.start, nullptr, 10);
+  if (token.type == JSMN_PRIMITIVE) {
+    return strtoll(json + token.start, nullptr, 10);
+  }
+  return 0ll;
 }
 
 template <>
 unsigned long parseJsonValue(jsmntok_t const& token, char const* json) {
   // Different function for unsigneds, same stuff for rest of unsigned-like
   // types
-  return strtoul(json + token.start, nullptr, 10);
+  if (token.type == JSMN_PRIMITIVE) {
+    return strtoul(json + token.start, nullptr, 10);
+  }
+  return 0ul;
 }
 
 template <>
@@ -200,32 +214,62 @@ unsigned short parseJsonValue(jsmntok_t const& token, char const* json) {
 template <>
 unsigned long long parseJsonValue(jsmntok_t const& token, char const* json) {
   // In this case i have to use strtoull
-  return strtoull(json + token.start, nullptr, 10);
+  if (token.type == JSMN_PRIMITIVE) {
+    return strtoull(json + token.start, nullptr, 10);
+  }
+  return 0ull;
 }
 
 template <>
 bool parseJsonValue(jsmntok_t const& token, char const* json) {
-  return strncmp(json + token.start, "true", token.end - token.start) == 0;
+  if (token.type == JSMN_PRIMITIVE) {
+    return strncmp(json + token.start, "true", token.end - token.start) == 0;
+  }
+  return false;
 }
 
 template <>
 float parseJsonValue(jsmntok_t const& token, char const* json) {
-  return strtof(json + token.start, nullptr);
+  if (token.type == JSMN_PRIMITIVE) {
+    return strtof(json + token.start, nullptr);
+  }
+  return 0.f;
 }
 
 template <>
 double parseJsonValue(jsmntok_t const& token, char const* json) {
-  return strtod(json + token.start, nullptr);
+  if (token.type == JSMN_PRIMITIVE) {
+    return strtod(json + token.start, nullptr);
+  }
+  return 0.;
 }
 
 template <>
 long double parseJsonValue(jsmntok_t const& token, char const* json) {
-  return strtold(json + token.start, nullptr);
+  if (token.type == JSMN_PRIMITIVE) {
+    return strtold(json + token.start, nullptr);
+  }
+  return 0.;
 }
 
 template <>
 JsonStringView parseJsonValue(jsmntok_t const& token, char const* json) {
-  return {json + token.start, token.size};
+  if (token.type == JSMN_STRING) {
+    return {json + token.start, token.end - token.start};
+  }
+  return JsonStringView{};
+}
+
+template <>
+char parseJsonValue(jsmntok_t const& token, char const* json) {
+  // This is just another integer conversion
+  return static_cast<char>(parseJsonValue<long>(token, json));
+}
+
+template <>
+unsigned char parseJsonValue(jsmntok_t const& token, char const* json) {
+  // This is just another integer conversion
+  return static_cast<char>(parseJsonValue<unsigned long>(token, json));
 }
 
 #endif
