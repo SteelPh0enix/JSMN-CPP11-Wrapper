@@ -81,7 +81,7 @@ class JsonParser {
 
   /// Inovkes JSMN to parse the JSON string.
   /// Returns amount of tokens parsed and sets `parsed` flag to true on success
-  /// Returns negative value (jsmnerr enumeration) on failure.
+  /// Returns negative value (`jsmnerr` enumeration from `jsmn.h`) on failure.
   int parse() {
     int retval =
         jsmn_parse(&mParser, mJson, strlen(mJson), mTokens, MaxTokenCount);
@@ -95,9 +95,9 @@ class JsonParser {
 
   /// Searches for key in JSON and returns value of requested type. Uses
   /// `parseJsonValue` function to convert string to requested type. In case
-  /// there is no specialisation for used type, it will return empty, default-
-  /// or zero-initialized object.
-  /// Complexity: linear
+  /// there is no specialization for used type, or requested key wasn't found,
+  /// it will return empty, default- or zero-initialized object. Complexity:
+  /// linear
   template <typename T>
   T get(char const* key) {
     TokenPair tokens = getTokenPair(key);
