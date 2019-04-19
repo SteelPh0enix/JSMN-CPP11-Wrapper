@@ -26,7 +26,7 @@ mingw32-make
 
 ## Footnotes
 
-Tests should be executed automatically.
+Tests have to be executed manually, until i'll create script for that.
 
 If you want to put test executables and stuff in different directory, just create new directory (`mkdir build`?), `cd` to it and use `..` instead of `.` in cmake command. Or just use GUI, whatever your fetishes are.
 
