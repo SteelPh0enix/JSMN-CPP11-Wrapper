@@ -118,7 +118,7 @@ class JsonParser {
       return false;
     }
 
-    std::memcpy(buffer, str.str, str.length);
+    memcpy(buffer, str.str, str.length);
     return true;
   }
 
