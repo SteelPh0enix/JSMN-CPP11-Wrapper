@@ -134,6 +134,7 @@ class JsonParser {
   /// Copies an array of values from JSON to buffer. If `key` wasn't found in
   /// JSON, array is empty, or pointer to buffer is invalid, does nothing and
   /// returns `false`. Complexity: linear
+  /// Should work with all types which have specialization for parseJsonValue.
   template <typename T>
   bool getArray(char const* key, T* buffer) {
     if (buffer == nullptr) {
