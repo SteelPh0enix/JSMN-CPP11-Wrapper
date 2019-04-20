@@ -8,7 +8,7 @@ That's why i created this wrapper for jsmn, which will hide C-style API from dev
 
 ### What about creating JSONs? Can i do it with this library?
 
-You know, [`snprintf`](https://en.cppreference.com/w/c/io/fprintf) is a thing. I honestly don't have any good idea on how to wrap JSON creation better and more user-friendly, that `snprintf` does. Let's just stick to it, it's not that bad.
+You know, [`snprintf`](https://en.cppreference.com/w/c/io/fprintf) is a thing. I honestly don't have any good idea on how to wrap JSON creation better and more user-friendly, than `snprintf` does, on low-level/low-resource platforms without C++ stdlib, without going into dynamic memory allocation territory. Let's just stick to it, it's not that bad.
 
 ## Dependencies
 
