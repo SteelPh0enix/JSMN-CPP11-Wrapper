@@ -6,6 +6,10 @@ I usually create software using modern C++ (at least C++11), therefore dealing w
 
 That's why i created this wrapper for jsmn, which will hide C-style API from developer eyes, and give him at least *slightly* better way to deal with JSON's, while maintaining speed and effeciency of jsmn.
 
+### What about creating JSONs? Can i do it with this library?
+
+You know, [`snprintf`](https://en.cppreference.com/w/c/io/fprintf) is a thing. I honestly don't have any good idea on how to wrap JSON creation better and more user-friendly, that `snprintf` does. Let's just stick to it, it's not that bad.
+
 ## Dependencies
 
 Only JSMN, and at least C++11-compatible compiler. I've used [modernized (header-only)](https://github.com/zserge/jsmn/tree/modernize) version in development, so if you want to use standard, separated version, you have to compile and link it by yourself.
