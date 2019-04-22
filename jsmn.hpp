@@ -1,5 +1,6 @@
 #ifndef JSMN_WRAPPER_HPP
 #define JSMN_WRAPPER_HPP
+#include <stdlib.h>
 #include <string.h>
 
 #include "jsmn.h"
