@@ -187,7 +187,7 @@ class JsonParser {
 */
 
 template <>
-long parseJsonValue(jsmntok_t const& token, char const* json) {
+inline long parseJsonValue(jsmntok_t const& token, char const* json) {
   if (token.type == JSMN_PRIMITIVE) {
     return strtol(json + token.start, nullptr, 10);
   }
@@ -195,19 +195,19 @@ long parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-int parseJsonValue(jsmntok_t const& token, char const* json) {
+inline int parseJsonValue(jsmntok_t const& token, char const* json) {
   // I'll just use `strtol` for every int-like overload, since it's pretty
   // stable, leaving type size management to user.
   return static_cast<int>(parseJsonValue<long>(token, json));
 }
 
 template <>
-short parseJsonValue(jsmntok_t const& token, char const* json) {
+inline short parseJsonValue(jsmntok_t const& token, char const* json) {
   return static_cast<short>(parseJsonValue<long>(token, json));
 }
 
 template <>
-long long parseJsonValue(jsmntok_t const& token, char const* json) {
+inline long long parseJsonValue(jsmntok_t const& token, char const* json) {
   // In this case i have to use strtoll
   if (token.type == JSMN_PRIMITIVE) {
     return strtoll(json + token.start, nullptr, 10);
@@ -216,7 +216,7 @@ long long parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-unsigned long parseJsonValue(jsmntok_t const& token, char const* json) {
+inline unsigned long parseJsonValue(jsmntok_t const& token, char const* json) {
   // Different function for unsigneds, same stuff for rest of unsigned-like
   // types
   if (token.type == JSMN_PRIMITIVE) {
@@ -226,20 +226,21 @@ unsigned long parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-unsigned int parseJsonValue(jsmntok_t const& token, char const* json) {
+inline unsigned int parseJsonValue(jsmntok_t const& token, char const* json) {
   // I'll just use `strtol` for every int-like overload, since it's pretty
   // stable, leaving type size management to user.
   return static_cast<unsigned int>(parseJsonValue<unsigned long>(token, json));
 }
 
 template <>
-unsigned short parseJsonValue(jsmntok_t const& token, char const* json) {
+inline unsigned short parseJsonValue(jsmntok_t const& token, char const* json) {
   return static_cast<unsigned short>(
       parseJsonValue<unsigned long>(token, json));
 }
 
 template <>
-unsigned long long parseJsonValue(jsmntok_t const& token, char const* json) {
+inline unsigned long long parseJsonValue(jsmntok_t const& token,
+                                         char const* json) {
   // In this case i have to use strtoull
   if (token.type == JSMN_PRIMITIVE) {
     return strtoull(json + token.start, nullptr, 10);
@@ -248,7 +249,7 @@ unsigned long long parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-bool parseJsonValue(jsmntok_t const& token, char const* json) {
+inline bool parseJsonValue(jsmntok_t const& token, char const* json) {
   if (token.type == JSMN_PRIMITIVE) {
     return strncmp(json + token.start, "true", token.end - token.start) == 0;
   }
@@ -256,7 +257,7 @@ bool parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-float parseJsonValue(jsmntok_t const& token, char const* json) {
+inline float parseJsonValue(jsmntok_t const& token, char const* json) {
   if (token.type == JSMN_PRIMITIVE) {
     return strtof(json + token.start, nullptr);
   }
@@ -264,7 +265,7 @@ float parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-double parseJsonValue(jsmntok_t const& token, char const* json) {
+inline double parseJsonValue(jsmntok_t const& token, char const* json) {
   if (token.type == JSMN_PRIMITIVE) {
     return strtod(json + token.start, nullptr);
   }
@@ -272,7 +273,7 @@ double parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-long double parseJsonValue(jsmntok_t const& token, char const* json) {
+inline long double parseJsonValue(jsmntok_t const& token, char const* json) {
   if (token.type == JSMN_PRIMITIVE) {
     return strtold(json + token.start, nullptr);
   }
@@ -280,7 +281,7 @@ long double parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-JsonStringView parseJsonValue(jsmntok_t const& token, char const* json) {
+inline JsonStringView parseJsonValue(jsmntok_t const& token, char const* json) {
   if (token.type == JSMN_STRING) {
     return {json + token.start, token.end - token.start};
   }
@@ -288,13 +289,13 @@ JsonStringView parseJsonValue(jsmntok_t const& token, char const* json) {
 }
 
 template <>
-char parseJsonValue(jsmntok_t const& token, char const* json) {
+inline char parseJsonValue(jsmntok_t const& token, char const* json) {
   // This is just another integer conversion
   return static_cast<char>(parseJsonValue<long>(token, json));
 }
 
 template <>
-unsigned char parseJsonValue(jsmntok_t const& token, char const* json) {
+inline unsigned char parseJsonValue(jsmntok_t const& token, char const* json) {
   // This is just another integer conversion
   return static_cast<char>(parseJsonValue<unsigned long>(token, json));
 }

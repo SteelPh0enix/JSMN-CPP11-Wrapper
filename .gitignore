@@ -1,5 +1,4 @@
 .vscode
-jsmn.h
 jsmn.c
 catch.hpp
 CMakeFiles

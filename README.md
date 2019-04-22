@@ -12,7 +12,9 @@ You know, [`snprintf`](https://en.cppreference.com/w/c/io/fprintf) is a thing. I
 
 ## Dependencies
 
-Only JSMN, and at least C++11-compatible compiler. I've used [modernized (header-only)](https://github.com/zserge/jsmn/tree/modernize) version in development, so if you want to use standard, separated version, you have to compile and link it by yourself.
+At least C++11-compatible compiler. I've used [modernized (header-only)](https://github.com/zserge/jsmn/tree/modernize) version of JSMN in development, so if you want to use standard, separated version, you have to compile and link it by yourself.
+
+Also, it's slightly modified (added some `inline`'s to make it suitable for template usage), so i suggest to `diff` it before swapping.
 
 In case you'd want to run tests, you will need [Catch2 library](https://github.com/catchorg/Catch2) and CMake. Go to [tests](./test) directory for more information.
 
